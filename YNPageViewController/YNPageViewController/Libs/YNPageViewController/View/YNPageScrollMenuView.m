@@ -89,15 +89,60 @@
     
 }
 
+#define TBRationW(var)  ([UIScreen mainScreen].bounds.size.width * ((var/3.0)/414.0f))
+
 - (void)setupButton:(UIButton *)itemButton title:(NSString *)title idx:(NSInteger)idx {
-    itemButton.titleLabel.font = self.configration.selectedItemFont;
-    [itemButton setTitleColor:self.configration.normalItemColor forState:UIControlStateNormal];
-    [itemButton setTitle:title forState:UIControlStateNormal];
+
     itemButton.tag = idx;
+    itemButton.titleLabel.numberOfLines = 0;
+    itemButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+    
+    NSMutableAttributedString *selectedAttrStr = [[NSMutableAttributedString alloc] initWithString:title];
+    NSMutableAttributedString *normalAttrStr = [[NSMutableAttributedString alloc] initWithString:title];
+    
+    NSArray *titles = [title componentsSeparatedByString:@"\n"];
+    
+    NSString *changeStr = titles.firstObject;
+    
+    UIColor *themeColor = [UIColor colorWithRed:66 / 255.0 green:190 / 255.0 blue:236 / 255.0 alpha:1];
+    UIColor *normalColr = [UIColor colorWithRed:121 / 255.0 green:122 / 255.0 blue:124 / 255.0 alpha:1];
+    UIFont *titleFont = [UIFont systemFontOfSize:TBRationW(39)];
+    UIFont *numFont = [UIFont systemFontOfSize:TBRationW(57)];
+    
+    //title --
+    NSDictionary *dic = @{
+                          NSFontAttributeName : titleFont,
+                          NSForegroundColorAttributeName : themeColor
+                          };
+    [selectedAttrStr addAttributes:dic range:NSMakeRange(0, title.length)];
+    
+    dic = @{
+            NSFontAttributeName : titleFont,
+            NSForegroundColorAttributeName : normalColr
+            };
+    [normalAttrStr addAttributes:dic range:NSMakeRange(0, title.length)];
+    
+    //num --
+    dic = @{
+            NSFontAttributeName : numFont,
+            NSForegroundColorAttributeName : themeColor
+            };
+    NSRange range = [title rangeOfString:changeStr];
+    
+    [selectedAttrStr addAttributes:dic range:range];
+    
+    dic = @{
+            NSFontAttributeName : numFont,
+            NSForegroundColorAttributeName : normalColr
+            };
+    [normalAttrStr addAttributes:dic range:range];
+    
+    [itemButton setAttributedTitle:selectedAttrStr forState:UIControlStateSelected];
+    [itemButton setAttributedTitle:normalAttrStr forState:UIControlStateNormal];
     
     [itemButton addTarget:self action:@selector(itemButtonOnClick:) forControlEvents:UIControlEventTouchUpInside];
-    
     [itemButton sizeToFit];
+    
     
     [self.itemsWidthArraM addObject:@(itemButton.yn_width)];
     [self.itemsArrayM addObject:itemButton];
